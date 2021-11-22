@@ -1,51 +1,45 @@
 using Code.Inputs;
+using Code.Counter;
 using UnityEngine;
 
 namespace Code.Player
 {
     public class Player : MonoBehaviour
     {
+        [SerializeField] private GameObject m_PlayerSprite;
+        [SerializeField] private SpriteRenderer m_SpriteRenderer;
+        [SerializeField] private float m_MoneyOnPlayerClick = 1;
+        [SerializeField] private CounterManager m_Counter;
+
         private InputManager m_InputManager;
         private Camera m_Camera;
-        [SerializeField] private float m_LerpSpeed = 5f;
-        [SerializeField] private float m_playerPadWidth = 1f; // Half
         private Vector3 pos;
         
         private void Awake()
         {
             m_InputManager = InputManager.Instance;
             m_Camera = Camera.main;
-            transform.position = new Vector3(0f, -4.75f, 0f);
         }
-       
-        private void Update()
+
+        private void OnEnable() => m_InputManager.StartTouchEvent += ClickOnPlayer;
+
+        private void OnDisable() => m_InputManager.EndTouchEvent -= ClickOnPlayer;
+
+        private void ClickOnPlayer(Vector2 screenPos, float time)
         {
-            if (m_InputManager.Dragging)
+            var screenCoords = new Vector3(screenPos.x, screenPos.y, m_Camera.nearClipPlane);
+            var worldCoords = m_Camera.ScreenToWorldPoint(screenCoords);
+            worldCoords.z = 0f;
+
+            if (IsClickOnSprite(worldCoords))
             {
-                pos = Move(m_InputManager.TouchPosition, Time.deltaTime);
-            }
-            else if (transform.position != pos && pos != Vector3.zero)
-            {
-                transform.position = Vector3.Lerp(transform.position, pos, Time.deltaTime * m_LerpSpeed);
+                m_Counter.AddMoney(m_MoneyOnPlayerClick);
             }
         }
 
-        private Vector3 Move(Vector2 screenPosition, float time)
+        private bool IsClickOnSprite(Vector3 clickPos)
         {
-            var screenWidth = Screen.width;
-            
-            Vector3 screenCoordinates = new(screenPosition.x, screenPosition.y, m_Camera.nearClipPlane);
-            var worldCoordinates = m_Camera.ScreenToWorldPoint(screenCoordinates);
-            worldCoordinates.z = 0f;
-            worldCoordinates.y = -4.75f;
-
-            if (worldCoordinates.x >= screenWidth - m_playerPadWidth)
-            {
-                worldCoordinates.x = (screenWidth - m_playerPadWidth);
-            }
-            
-            transform.position = Vector3.Lerp(transform.position, worldCoordinates, time * m_LerpSpeed);
-            return worldCoordinates;
+            return m_SpriteRenderer.bounds.Contains(clickPos);
         }
     }
 }

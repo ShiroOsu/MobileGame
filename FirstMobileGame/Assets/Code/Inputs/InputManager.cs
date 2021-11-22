@@ -1,3 +1,4 @@
+using System;
 using Code.Tools;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,18 +7,24 @@ using UnityEngine.InputSystem.EnhancedTouch;
 namespace Code.Inputs
 {
     [DefaultExecutionOrder(-1)]
-    public class InputManager : Singleton<InputManager>, TouchControls.ITouchActions
+    public class InputManager : Singleton<InputManager>
     {
         private TouchControls m_TouchControls;
-        public bool Dragging { get; private set; }
-        public Vector2 TouchPosition { get; private set; }
+
+        public event Action<Vector2, float> StartTouchEvent;
+        public event Action<Vector2, float> EndTouchEvent; 
 
         private void Awake()
         {
             m_TouchControls = new();
-            m_TouchControls.Touch.SetCallbacks(this);
         }
-        
+
+        private void Start()
+        {
+            m_TouchControls.Touch.TouchPress.started += OnTouchPress;
+            m_TouchControls.Touch.TouchPress.canceled += OnTouchPressEnd;
+        }
+
         private void OnEnable()
         {
             m_TouchControls.Enable();
@@ -29,23 +36,14 @@ namespace Code.Inputs
             m_TouchControls.Disable();
         }
         
-        public void OnTouchPress(InputAction.CallbackContext context)
+        private void OnTouchPress(InputAction.CallbackContext context)
         {
+            StartTouchEvent?.Invoke(m_TouchControls.Touch.TouchPosition.ReadValue<Vector2>(), (float)context.startTime);
         }
-
-        public void OnTouchPosition(InputAction.CallbackContext context)
+        
+        private void OnTouchPressEnd(InputAction.CallbackContext context)
         {
-            TouchPosition = context.ReadValue<Vector2>();
-        }
-
-        public void OnTouchHold(InputAction.CallbackContext context)
-        {
-            Dragging = true;
-        }
-
-        public void OnTouchRelease(InputAction.CallbackContext context)
-        {
-            Dragging = false;
+            EndTouchEvent?.Invoke(m_TouchControls.Touch.TouchPosition.ReadValue<Vector2>(), (float)context.time);
         }
     }
 }

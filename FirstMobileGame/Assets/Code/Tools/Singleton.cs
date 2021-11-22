@@ -13,7 +13,13 @@ namespace Code.Tools
                 if (instance) 
                     return instance;
 
-                return instance = (new GameObject {name = nameof(T), hideFlags = HideFlags.HideAndDontSave}).AddComponent<T>();
+                instance = FindObjectOfType<T>();
+                
+                if (!instance)
+                {
+                    return instance = (new GameObject {name = nameof(T), hideFlags = HideFlags.None}).AddComponent<T>();
+                }
+                return instance;
             }
         }
 

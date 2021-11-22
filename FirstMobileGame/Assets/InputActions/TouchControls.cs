@@ -44,24 +44,6 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""TouchHold"",
-                    ""type"": ""Button"",
-                    ""id"": ""10efd283-e22c-433d-8b9b-c632895b0145"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""TouchRelease"",
-                    ""type"": ""Button"",
-                    ""id"": ""b378e240-015f-44c1-8444-81c098b41533"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -86,28 +68,6 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
                     ""action"": ""TouchPosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""9a150cc1-1c6c-4bf2-bcb0-0afbad67e14f"",
-                    ""path"": ""<Touchscreen>/primaryTouch/press"",
-                    ""interactions"": ""Hold"",
-                    ""processors"": """",
-                    ""groups"": ""MobilePlayer"",
-                    ""action"": ""TouchHold"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""38ef9904-5f31-4654-8506-d90b31ae3387"",
-                    ""path"": ""<Touchscreen>/primaryTouch/press"",
-                    ""interactions"": ""Press(behavior=1)"",
-                    ""processors"": """",
-                    ""groups"": ""MobilePlayer"",
-                    ""action"": ""TouchRelease"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -130,8 +90,6 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
         m_Touch = asset.FindActionMap("Touch", throwIfNotFound: true);
         m_Touch_TouchPress = m_Touch.FindAction("TouchPress", throwIfNotFound: true);
         m_Touch_TouchPosition = m_Touch.FindAction("TouchPosition", throwIfNotFound: true);
-        m_Touch_TouchHold = m_Touch.FindAction("TouchHold", throwIfNotFound: true);
-        m_Touch_TouchRelease = m_Touch.FindAction("TouchRelease", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -193,16 +151,12 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
     private ITouchActions m_TouchActionsCallbackInterface;
     private readonly InputAction m_Touch_TouchPress;
     private readonly InputAction m_Touch_TouchPosition;
-    private readonly InputAction m_Touch_TouchHold;
-    private readonly InputAction m_Touch_TouchRelease;
     public struct TouchActions
     {
         private @TouchControls m_Wrapper;
         public TouchActions(@TouchControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @TouchPress => m_Wrapper.m_Touch_TouchPress;
         public InputAction @TouchPosition => m_Wrapper.m_Touch_TouchPosition;
-        public InputAction @TouchHold => m_Wrapper.m_Touch_TouchHold;
-        public InputAction @TouchRelease => m_Wrapper.m_Touch_TouchRelease;
         public InputActionMap Get() { return m_Wrapper.m_Touch; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -218,12 +172,6 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
                 @TouchPosition.started -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchPosition;
                 @TouchPosition.performed -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchPosition;
                 @TouchPosition.canceled -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchPosition;
-                @TouchHold.started -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchHold;
-                @TouchHold.performed -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchHold;
-                @TouchHold.canceled -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchHold;
-                @TouchRelease.started -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchRelease;
-                @TouchRelease.performed -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchRelease;
-                @TouchRelease.canceled -= m_Wrapper.m_TouchActionsCallbackInterface.OnTouchRelease;
             }
             m_Wrapper.m_TouchActionsCallbackInterface = instance;
             if (instance != null)
@@ -234,12 +182,6 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
                 @TouchPosition.started += instance.OnTouchPosition;
                 @TouchPosition.performed += instance.OnTouchPosition;
                 @TouchPosition.canceled += instance.OnTouchPosition;
-                @TouchHold.started += instance.OnTouchHold;
-                @TouchHold.performed += instance.OnTouchHold;
-                @TouchHold.canceled += instance.OnTouchHold;
-                @TouchRelease.started += instance.OnTouchRelease;
-                @TouchRelease.performed += instance.OnTouchRelease;
-                @TouchRelease.canceled += instance.OnTouchRelease;
             }
         }
     }
@@ -257,7 +199,5 @@ public partial class @TouchControls : IInputActionCollection2, IDisposable
     {
         void OnTouchPress(InputAction.CallbackContext context);
         void OnTouchPosition(InputAction.CallbackContext context);
-        void OnTouchHold(InputAction.CallbackContext context);
-        void OnTouchRelease(InputAction.CallbackContext context);
     }
 }
