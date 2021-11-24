@@ -1,4 +1,4 @@
 # MobileGame
-first mobile game
+first mobile game in Unity
 
 Simple 'Clicker' game. (such as cookie clicker)
