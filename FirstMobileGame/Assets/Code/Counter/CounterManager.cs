@@ -8,7 +8,7 @@ namespace Code.Counter
     {
         [SerializeField] private TMP_Text m_CounterText;
         [SerializeField] private TMP_Text m_IncomePerSecond;
-        public float CurrentMoney { get; private set; }
+        public float CurrentMoney { get; set; }
         public float CurrentIncomePerSecond { get; private set; }
         private const float m_PerSecond = 1.0f;
         private float m_CurrentTime;

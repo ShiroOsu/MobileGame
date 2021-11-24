@@ -56,7 +56,7 @@ namespace Code
             
             if (m_PerTenCurrent > m_PerTen)
             {
-                m_MaxObjectsFalling = (uint) Mathf.RoundToInt(m_Counter.CurrentIncomePerSecond);
+                m_MaxObjectsFalling = (uint) Mathf.RoundToInt(m_Counter.CurrentIncomePerSecond * 0.001f);
                 if (m_MaxObjectsFalling > 100)
                 {
                     m_MaxObjectsFalling = 100;
@@ -82,6 +82,7 @@ namespace Code
                 obj.transform.position = new Vector3(ranX, m_SpawnHeight.position.y, 5f);
                 m_FallingList.Add(obj);
                 m_NumberOfObjectsFalling++;
+                Debug.Log("Spawn");
             }
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Code.Counter;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,56 +9,69 @@ namespace Code.Shop
 {
     public class Shop : MonoBehaviour
     {
-        [SerializeField] private List<ButtonStruct> m_StructList;
-        private float m_CurrentMoney;
+        [SerializeField] private List<ButtonInfo> m_InfoList;
         private CounterManager m_Counter;
         
         [Serializable]
-        public struct ButtonStruct
+        public class ButtonInfo
         {
             public Button button;
             public int baseCost;
             public float incomePerSecond;
-            public int numberOfBought;
+            [HideInInspector] public int numberOfBought;
+            public TMP_Text buttonTextCost;
+            public TMP_Text buttonIncomeGain;
+            [HideInInspector] public bool canBuy = false;
         }
         
         private void Awake()
         {
             m_Counter = CounterManager.Instance;
             
-            for (int i = 0; i < m_StructList.Count; i++)
+            for (int i = 0; i < m_InfoList.Count; i++)
             {
                 var y = i;
-                m_StructList[i].button.onClick.AddListener(() => Buy(y));
+                m_InfoList[i].button.onClick.AddListener(() => Buy(y));
+            }
+
+            foreach (var b in m_InfoList)
+            {
+                UpdateText(b);
             }
         }
 
-        private void FixedUpdate()
+        private void Update()
         {
-            m_CurrentMoney = m_Counter.CurrentMoney;
-            UpdateButtonCanBuy();
-        }
-
-        private void Start()
-        {
-            m_CurrentMoney = m_Counter.CurrentMoney;
             UpdateButtonCanBuy();
         }
 
         private void Buy(int index)
         {
-            var buttonStruct = m_StructList[index];
-            buttonStruct.numberOfBought++;
-            m_Counter.AddIncome(buttonStruct.incomePerSecond);
-            buttonStruct.baseCost += Mathf.RoundToInt(buttonStruct.baseCost * (buttonStruct.numberOfBought + 1) * 0.25f);
+            var buttonInfo = m_InfoList[index];
+
+            if (buttonInfo.baseCost > m_Counter.CurrentMoney)
+                return;
+            
+            buttonInfo.numberOfBought += 1;
+            m_Counter.CurrentMoney -= buttonInfo.baseCost;
+            m_Counter.AddIncome(buttonInfo.incomePerSecond);
+            buttonInfo.baseCost += Mathf.RoundToInt(buttonInfo.baseCost * 0.1f);
+            UpdateText(buttonInfo);
         }
 
         private void UpdateButtonCanBuy()
         {
-            foreach (var buttonStruct in m_StructList)
+            foreach (var infoButton in m_InfoList)
             {
-                buttonStruct.button.enabled = buttonStruct.baseCost > m_CurrentMoney;
+                infoButton.canBuy = m_Counter.CurrentMoney >= infoButton.baseCost;
+                infoButton.button.interactable = infoButton.canBuy;
             }
+        }
+
+        private void UpdateText(ButtonInfo buttonInfo)
+        {
+            buttonInfo.buttonTextCost.SetText("Buy: " + buttonInfo.baseCost + "$" + "\n Owned: " + buttonInfo.numberOfBought);
+            buttonInfo.buttonIncomeGain.SetText("Income: " + buttonInfo.incomePerSecond);
         }
     }
 }
